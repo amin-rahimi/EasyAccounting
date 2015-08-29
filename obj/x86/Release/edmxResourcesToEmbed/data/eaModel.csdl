@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="eadbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="eadbEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Appointments" EntityType="eadbModel.Appointment" />
+    <EntitySet Name="Customers" EntityType="eadbModel.Customer" />
+    <EntitySet Name="Photos" EntityType="eadbModel.Photo" />
+    <AssociationSet Name="FK_Photos_Customers" Association="eadbModel.FK_Photos_Customers">
+      <End Role="Customer" EntitySet="Customers" />
+      <End Role="Photo" EntitySet="Photos" />
+    </AssociationSet>
+    <EntitySet Name="Contracts" EntityType="eadbModel.Contract" />
+    <AssociationSet Name="FK_Appointment_Contracts" Association="eadbModel.FK_Appointment_Contracts">
+      <End Role="Contract" EntitySet="Contracts" />
+      <End Role="Appointment" EntitySet="Appointments" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Contracts_Customers" Association="eadbModel.FK_Contracts_Customers">
+      <End Role="Customer" EntitySet="Customers" />
+      <End Role="Contract" EntitySet="Contracts" />
+    </AssociationSet>
+    <EntitySet Name="Payments" EntityType="eadbModel.Payment" />
+    <AssociationSet Name="FK_Payment_Contracts" Association="eadbModel.FK_Payment_Contracts">
+      <End Role="Contract" EntitySet="Contracts" />
+      <End Role="Payment" EntitySet="Payments" />
+    </AssociationSet>
+    <EntitySet Name="DefaultSettings" EntityType="eadbModel.DefaultSetting" />
+  </EntityContainer>
+  <EntityType Name="Appointment">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ContractId" Type="Int32" />
+    <Property Name="AppointmentDate" Type="Int32" />
+    <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="AppointmentTime" Type="Time" Precision="7" />
+    <NavigationProperty Name="Contract" Relationship="eadbModel.FK_Appointment_Contracts" FromRole="Appointment" ToRole="Contract" />
+  </EntityType>
+  <EntityType Name="Customer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="PhoneNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Gender" Type="Boolean" />
+    <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="CreatedDate" Type="Int32" />
+    <NavigationProperty Name="Photos" Relationship="eadbModel.FK_Photos_Customers" FromRole="Customer" ToRole="Photo" />
+    <NavigationProperty Name="Contracts" Relationship="eadbModel.FK_Contracts_Customers" FromRole="Customer" ToRole="Contract" />
+  </EntityType>
+  <EntityType Name="Photo">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CustomerId" Type="Int32" />
+    <Property Name="Image" Type="Binary" MaxLength="Max" FixedLength="false" />
+    <Property Name="IsBefore" Type="Boolean" />
+    <NavigationProperty Name="Customer" Relationship="eadbModel.FK_Photos_Customers" FromRole="Photo" ToRole="Customer" />
+  </EntityType>
+  <Association Name="FK_Photos_Customers">
+    <End Type="eadbModel.Customer" Role="Customer" Multiplicity="0..1" />
+    <End Type="eadbModel.Photo" Role="Photo" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Photo">
+        <PropertyRef Name="CustomerId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Contract">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CustomerId" Type="Int32" />
+    <Property Name="ContractPayment" Type="Int32" />
+    <Property Name="ContractStartDate" Type="Int32" />
+    <Property Name="ContractEndDate" Type="Int32" />
+    <Property Name="Description" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="NextAppointmentDate" Type="Int32" />
+    <Property Name="NextAppointmentTime" Type="Time" Precision="7" />
+    <Property Name="IsAppointmentFinished" Type="Boolean" />
+    <Property Name="Payment" Type="Int32" />
+    <NavigationProperty Name="Appointments" Relationship="eadbModel.FK_Appointment_Contracts" FromRole="Contract" ToRole="Appointment" />
+    <NavigationProperty Name="Customer" Relationship="eadbModel.FK_Contracts_Customers" FromRole="Contract" ToRole="Customer" />
+    <NavigationProperty Name="Payments" Relationship="eadbModel.FK_Payment_Contracts" FromRole="Contract" ToRole="Payment" />
+  </EntityType>
+  <Association Name="FK_Appointment_Contracts">
+    <End Type="eadbModel.Contract" Role="Contract" Multiplicity="0..1" />
+    <End Type="eadbModel.Appointment" Role="Appointment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Contract">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Appointment">
+        <PropertyRef Name="ContractId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Contracts_Customers">
+    <End Type="eadbModel.Customer" Role="Customer" Multiplicity="0..1" />
+    <End Type="eadbModel.Contract" Role="Contract" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Contract">
+        <PropertyRef Name="CustomerId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Payment">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ContractId" Type="Int32" />
+    <Property Name="AmountOfPayment" Type="Int32" />
+    <Property Name="DateOfPayment" Type="Int32" />
+    <Property Name="Year" Type="Int32" />
+    <Property Name="Month" Type="Int32" />
+    <Property Name="Day" Type="Int32" />
+    <NavigationProperty Name="Contract" Relationship="eadbModel.FK_Payment_Contracts" FromRole="Payment" ToRole="Contract" />
+  </EntityType>
+  <Association Name="FK_Payment_Contracts">
+    <End Type="eadbModel.Contract" Role="Contract" Multiplicity="0..1" />
+    <End Type="eadbModel.Payment" Role="Payment" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Contract">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Payment">
+        <PropertyRef Name="ContractId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="DefaultSetting">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Value" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+</Schema>
